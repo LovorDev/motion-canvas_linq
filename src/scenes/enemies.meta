@@ -1,0 +1,54 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "event_1",
+      "targetTime": 1.6333333333333333
+    },
+    {
+      "name": "event_2",
+      "targetTime": 2.7333333333333343
+    },
+    {
+      "name": "end",
+      "targetTime": 7.157454890788225
+    },
+    {
+      "name": "dif colors",
+      "targetTime": 8.157454890788225
+    },
+    {
+      "name": "for code block",
+      "targetTime": 13.336989553656222
+    },
+    {
+      "name": "foreach code block",
+      "targetTime": 18.13050807217474
+    },
+    {
+      "name": "where code block",
+      "targetTime": 21.637915479582148
+    },
+    {
+      "name": "lambda code block",
+      "targetTime": 25.31925451092118
+    },
+    {
+      "name": "function code block",
+      "targetTime": 30.334069325735996
+    },
+    {
+      "name": "predicate select code block",
+      "targetTime": 38.687084520417855
+    },
+    {
+      "name": "return code block",
+      "targetTime": 45.59066951566952
+    },
+    {
+      "name": "revert lambda code block",
+      "targetTime": 51.0886277302944
+    }
+  ],
+  "seed": 4070339400
+}
