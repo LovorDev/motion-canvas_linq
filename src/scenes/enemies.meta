@@ -42,12 +42,100 @@
       "targetTime": 38.687084520417855
     },
     {
+      "name": "remove predicate select code block",
+      "targetTime": 43.90173313710214
+    },
+    {
       "name": "return code block",
-      "targetTime": 45.59066951566952
+      "targetTime": 49.85327276713713
     },
     {
       "name": "revert lambda code block",
-      "targetTime": 51.0886277302944
+      "targetTime": 54.13674625648353
+    },
+    {
+      "name": "new property name",
+      "targetTime": 60.66129719379551
+    },
+    {
+      "name": "presenter",
+      "targetTime": 65.80499720673967
+    },
+    {
+      "name": "all array",
+      "targetTime": 72.32938425264585
+    },
+    {
+      "name": "string array",
+      "targetTime": 78.82995787256618
+    },
+    {
+      "name": "remove",
+      "targetTime": 79.8883323608263
+    },
+    {
+      "name": "foreach select",
+      "targetTime": 89.37136777563693
+    },
+    {
+      "name": "select name",
+      "targetTime": 93.75816613806929
+    },
+    {
+      "name": "convertToLinq",
+      "targetTime": 100.75898559509832
+    },
+    {
+      "name": "change property",
+      "targetTime": 105.06869423015905
+    },
+    {
+      "name": "change new object",
+      "targetTime": 112.95769904861324
+    },
+    {
+      "name": "health change",
+      "targetTime": 119.45713145457569
+    },
+    {
+      "name": "where health",
+      "targetTime": 125.90631790312189
+    },
+    {
+      "name": "first [0] where health",
+      "targetTime": 129.68621952015536
+    },
+    {
+      "name": "first where health",
+      "targetTime": 136.61496702931254
+    },
+    {
+      "name": "first health",
+      "targetTime": 142.33449781824152
+    },
+    {
+      "name": "increase health",
+      "targetTime": 149.96403995905123
+    },
+    {
+      "name": "firstOrDefault health",
+      "targetTime": 158.65243934386535
+    },
+    {
+      "name": "last",
+      "targetTime": 166.75217446664783
+    },
+    {
+      "name": "last only",
+      "targetTime": 176.62168633577554
+    },
+    {
+      "name": "has enemy",
+      "targetTime": 179.62168633577554
+    },
+    {
+      "name": "is null only",
+      "targetTime": 187.63067601838873
     }
   ],
   "seed": 4070339400
