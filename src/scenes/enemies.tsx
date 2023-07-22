@@ -1,12 +1,12 @@
 ﻿import {makeScene2D, View2D} from "@motion-canvas/2d";
 import {Rect, Txt,} from "@motion-canvas/2d/lib/components";
 import {all, sequence, waitUntil} from "@motion-canvas/core/lib/flow";
-import {createRef, makeRef, range, Reference, useRandom} from "@motion-canvas/core/lib/utils";
+import {createRef, makeRef, range, Reference, useLogger, useRandom} from "@motion-canvas/core/lib/utils";
 import {createSignal, DEFAULT} from "@motion-canvas/core/lib/signals";
 import {easeInQuad} from "@motion-canvas/core/lib/tweening";
-import {CodeBlock, edit, insert, remove} from "@motion-canvas/2d/lib/components/CodeBlock";
+import {CodeBlock, edit, insert, lines, remove} from "@motion-canvas/2d/lib/components/CodeBlock";
 import {Enemy} from "./Enemy";
-import {Random} from "@motion-canvas/core";
+import {Logger, Random} from "@motion-canvas/core";
 
 
 const RED = '#9a4f50';
@@ -16,14 +16,15 @@ const GRAY = '#9a9a97';
 const LIGHT = '#c5ccb8';
 const circleSize = 200;
 const circlesCount = 20;
-
+let logger: Logger | Console;
 
 
 export default makeScene2D(function* (view) {
 
     view.fontFamily('JetBrains Mono')
     view.fontStyle('monospace')
-
+    logger = useLogger();
+    
     const random = useRandom(112, true);
     const halfWidth = view.width() / 2;
     const halfHeight = view.height() / 2;
@@ -46,6 +47,7 @@ export default makeScene2D(function* (view) {
             width={0}
             height={0}
             radius={30}
+            layout={true}
             x={random.nextInt(-halfWidth, halfWidth)}
             y={random.nextInt(-halfHeight, halfHeight)}
             lineWidth={5}
@@ -150,6 +152,8 @@ export default makeScene2D(function* (view) {
     yield* waitUntil('health change');
 
     yield* firstMethod(view, allCircles,random);
+    
+    yield* sequenceMethod(view, allCircles, random,rect);
 });
 
 
@@ -164,12 +168,172 @@ const shuffle = ([...arr]) => {
     return arr;
 };
 
+function* sequenceMethod(view: View2D, allCircles: Enemy[], random: Random, rectReference: Reference<Rect>) {
+
+    const codeRef = createRef<CodeBlock>();
+    const enemyRef = createRef<CodeBlock>();
+    let code = 'var newEnemies = enemies.Where(e => e.Color == Color.Red);';
+    
+    yield view.add(
+        <CodeBlock language="c#" ref={codeRef} code={`${code}`}/>
+    );
+
+    yield* waitUntil('where color');
+    yield* codeRef().edit(2)`var newEnemies = enemies${insert('\n    ')}.Where(e => e.Color == Color.Red${insert(' && !string.IsNullOrEmpty(e.Name)')});`
+    yield* waitUntil('where color and names');
+    yield* codeRef().edit(2)`var newEnemies = enemies\n    .Where(e => e.Color == Color.Red && !string.IsNullOrEmpty(e.Name))${insert
+    ('\n    .Select(e => e.Name)')};`
+    
+    yield* waitUntil('select names');
+
+    yield codeRef().selection(DEFAULT,1);
+    yield view.add(
+        <CodeBlock language="c#" ref={enemyRef} fontSize={40} opacity={0} position={[200,300]} code={`
+class Enemy
+{
+    public Color Color { get; }
+    public string Name { get; }
+    public float HealthPercent { get; }
+}`}/>
+    );
+    
+    yield * enemyRef().opacity(1,1)
+    
+    allCircles.map((c)=> c.fontSize(40))
+    yield sequence(
+        .075,
+        ...allCircles.map((c)=> c.text(random.nextInt(1,4).toString(),1))
+    )
+    
+    yield * enemyRef().edit(2)`
+class Enemy
+{
+    public Color Color { get; }
+    public string Name { get; }
+    public float HealthPercent { get; }${insert('\n    public int DangerCount { get; }')}
+}`
+
+    
+    yield* waitUntil('danger count');
+    
+    yield enemyRef().opacity(0,2)
+    yield* codeRef().edit(2)`var newEnemies = enemies
+    .Where(e => e.Color == Color.Red && !string.IsNullOrEmpty(e.Name))${insert('\n    .OrderBy(e => e.DangerCount)')}
+    .Select(e => e.Name);`
+
+    var positions = allCircles.map((c)=> c.position())
+    rectReference().layout(false);
+
+    allCircles.map((c,i)=> c.position(positions[i]))
+
+    yield codeRef().position([codeRef().position().x, codeRef().position().y + 100],2)
+
+    const onlyRed = allCircles.filter((c, i) => c.fill().toString() == RED);
+
+    // onlyRed.sort((n1, n2) => +n1.text > +n2.text ? 1 : -1);
+    yield* sequence(
+        .03,
+        ...onlyRed.map((c,i) => {
+            return c.position([positions[i].x, positions[i].y + 120], 2);
+        })
+    )
+    
+    const sortedArray: Enemy[] = [...onlyRed];
+    
+    sortedArray.sort((n1, n2) => +n1.text() > +n2.text() ? 1 : -1);
+
+
+    yield* waitUntil('order by');
+    let ix = onlyRed[0].position().x
+    yield* sequence(
+        .05,
+        ...onlyRed.map((c, i) => c.position([ix + sortedArray.indexOf(c) * (c.width()+10),160],1))
+    )
+     
+    yield* waitUntil('order past select');
+
+    
+    yield* codeRef().edit(2)`var newEnemies = enemies
+    .Where(e => e.Color == Color.Red && !string.IsNullOrEmpty(e.Name))${remove('\n    .OrderBy(e => e.DangerCount)')}
+    .Select(e => e.Name)${insert('\n    .OrderBy(e => e.DangerCount)')};`
+
+    yield* codeRef().selection(DEFAULT,1);
+    
+    let warningRect = createRef<Rect>()
+    view.add(<Rect ref={warningRect} fill={RED} opacity={0.2} size={[800,60]} position={[-420,180]}/>)
+
+    yield * warningRect().opacity(.5,.3).to(.2,.3).to(.5,.3).to(.2,.3).to(.5,.3);
+    
+    yield* waitUntil('order past select warning');
+    yield * warningRect().opacity(0,1)
+    warningRect().remove()
+
+    yield* codeRef().edit(2)`var newEnemies = enemies
+    .Where(e => e.Color == Color.Red && !string.IsNullOrEmpty(e.Name))${insert('\n    .OrderBy(e => e.DangerCount)')}
+    .Select(e => e.Name)${remove('\n    .OrderBy(e => e.DangerCount)')};`
+    
+
+    yield* codeRef().selection(DEFAULT,1);
+    
+    yield* waitUntil('remove select warning');
+
+
+    yield* codeRef().edit(2)`var newEnemies = enemies
+    .Where(e => e.Color == Color.Red && !string.IsNullOrEmpty(e.Name))
+    .OrderBy(e => e.DangerCount)${insert('\n    .OrderBy(e => e.HealthPercent)')}
+    .Select(e => e.Name);`
+
+    yield* codeRef().selection(DEFAULT,1);
+    yield* waitUntil('visualize another order');
+
+    sortedArray.sort((n1, n2) => n1.health() < n2.health() ? 1 : -1);
+    yield* sequence(
+        .05,
+        ...onlyRed.map((c, i) => c.position([ix + sortedArray.indexOf(c) * (c.width()+10),160],1))
+    )
+    
+    yield* waitUntil('another order');
+    
+    yield* codeRef().edit(4)`var newEnemies = enemies
+    .Where(e => e.Color == Color.Red && !string.IsNullOrEmpty(e.Name))
+    .OrderBy(e => e.DangerCount)
+    ${edit('.OrderBy','.ThenBy')}(e => e.HealthPercent)
+    .Select(e => e.Name);`
+
+
+    yield* codeRef().selection(DEFAULT,1);
+    yield* waitUntil('correct order');
+
+    sortedArray.sort((n1, n2) => +n1.text() - +n2.text() || n2.health() - n1.health());
+    // .sort((n1, n2) => n1.health() < n2.health() ? 1 : -1);
+    yield* sequence(
+        .05,
+        ...onlyRed.map((c, i) => c.position([ix + sortedArray.indexOf(c) * (c.width()+10),160],1))
+    )
+    yield* waitUntil('visualize correct order');
+
+    yield* codeRef().edit(4)`var newEnemies = enemies
+    .Where(e => e.Color == Color.Red && !string.IsNullOrEmpty(e.Name))
+    ${edit('.OrderBy','.OrderByDescending')}(e => e.DangerCount)
+    ${edit('.ThenBy','.ThenByDescending')}(e => e.HealthPercent)
+    .Select(e => e.Name);`
+    sortedArray.sort((n1, n2) => +n2.text() - +n1.text() || n1.health() - n2.health());
+    // .sort((n1, n2) => n1.health() < n2.health() ? 1 : -1);
+    yield* sequence(
+        .05,
+        ...onlyRed.map((c, i) => c.position([ix + sortedArray.indexOf(c) * (c.width()+10),160],1))
+    )
+    yield* codeRef().selection(DEFAULT,1);
+    yield* waitUntil('descending correct order');
+}
+
+
+
 function* firstMethod(view: View2D, allCircles: Enemy[], random: Random) {
     const codeRef = createRef<CodeBlock>();
 
     yield* all( ...allCircles.map((c)=> c.health(random.nextInt(0, c.height()),4)));
     let code =`var damagedEnemy = enemies.Where(enemy => enemy.HealthPercent < 0.25f);`;
-    
     
     yield view.add(
         <CodeBlock language="c#" ref={codeRef} code={`${code}`}/>
@@ -221,7 +385,19 @@ function* firstMethod(view: View2D, allCircles: Enemy[], random: Random) {
 
     yield* waitUntil('is null only');
     
-    
+    yield* codeRef().edit(2)`var hasDamaged = enemies.${edit('\n    FirstOrDefault','Any')}(enemy => enemy.HealthPercent < 0.25f)${remove(' is not null')};`;
+
+    yield* waitUntil('any only');
+
+    yield* codeRef().edit(2)`var hasDamaged = enemies.${edit('Any','All')}(enemy => enemy.HealthPercent < 0.25f);`;
+
+    yield* waitUntil('all only');
+    yield* codeRef().edit(2)`var hasDamaged = enemies.${edit('All','Count')}(enemy => enemy.HealthPercent < 0.25f);`;
+
+    yield* waitUntil('count');
+
+    yield* codeRef().opacity(0,3)
+    codeRef().remove()
 }
 
 function* selectMethod(view: View2D){
@@ -258,6 +434,7 @@ var enemyNames = ${edit('new List<\string>();','enemies.')}${edit('\n\nforeach (
     yield* codeRef().edit(2)`var enemyNames = enemies.Select(enemy => ${edit('enemy.transform.position','new Enemy("Clone of: " + enemy.Name)')})`
     
     yield* waitUntil('change new object');
+    yield* codeRef().opacity(0,3)
     codeRef().remove()
 }
 
@@ -331,6 +508,7 @@ public class ${edit('Enemy','Names')}Presenter : MonoBehaviour
     }
 }`;
     yield* waitUntil('string array');
+    yield* rect().opacity(0,3)
     rect().remove()
     yield* waitUntil('remove');
 }
@@ -421,7 +599,8 @@ ${edit('for (var i = 0; i < enemies.Length; i++)', 'foreach (var enemy in enemie
     yield* codeRef().edit(2)`var redEnemies = enemies.Where(${edit('\n{\n    return enemy.Color == Color.Red;\n}', 'enemy => enemy.Color == Color.Red')});`;
 
     yield* waitUntil('revert lambda code block');
-    
+
+    yield* codeRef().opacity(0,3)
     codeRef().remove();
 }
 

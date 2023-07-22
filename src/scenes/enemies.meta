@@ -71,7 +71,7 @@
     },
     {
       "name": "remove",
-      "targetTime": 79.8883323608263
+      "targetTime": 81.82995787256618
     },
     {
       "name": "foreach select",
@@ -136,6 +136,70 @@
     {
       "name": "is null only",
       "targetTime": 187.63067601838873
+    },
+    {
+      "name": "any only",
+      "targetTime": 191.7304111411712
+    },
+    {
+      "name": "all only",
+      "targetTime": 196.55980192357092
+    },
+    {
+      "name": "count",
+      "targetTime": 200.1795975897174
+    },
+    {
+      "name": "where color",
+      "targetTime": 205.7292759530961
+    },
+    {
+      "name": "where color and names",
+      "targetTime": 210.00898837211707
+    },
+    {
+      "name": "select names",
+      "targetTime": 216.53841699411927
+    },
+    {
+      "name": "danger count",
+      "targetTime": 221.39780399255872
+    },
+    {
+      "name": "order by",
+      "targetTime": 227.87377936996154
+    },
+    {
+      "name": "order past select",
+      "targetTime": 235.34283716385923
+    },
+    {
+      "name": "order past select warning",
+      "targetTime": 241.2824663357547
+    },
+    {
+      "name": "remove select warning",
+      "targetTime": 247.94166413618166
+    },
+    {
+      "name": "visualize another order",
+      "targetTime": 254.7211873571901
+    },
+    {
+      "name": "another order",
+      "targetTime": 264.51982513149994
+    },
+    {
+      "name": "correct order",
+      "targetTime": 273.2487239990671
+    },
+    {
+      "name": "visualize correct order",
+      "targetTime": 281.0879180155339
+    },
+    {
+      "name": "descending correct order",
+      "targetTime": 290.12728231021185
     }
   ],
   "seed": 4070339400
