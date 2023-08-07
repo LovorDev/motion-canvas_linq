@@ -1,0 +1,18 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "distinct hashset",
+      "targetTime": 12.501764050401063
+    },
+    {
+      "name": "Skip take",
+      "targetTime": 26.811920680491642
+    },
+    {
+      "name": "new scene start",
+      "targetTime": 41.987042954590066
+    }
+  ],
+  "seed": 3848055721
+}

@@ -200,6 +200,10 @@
     {
       "name": "descending correct order",
       "targetTime": 290.12728231021185
+    },
+    {
+      "name": "reverse order",
+      "targetTime": 295.9691431751609
     }
   ],
   "seed": 4070339400

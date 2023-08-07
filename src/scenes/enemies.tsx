@@ -1,19 +1,15 @@
 ﻿import {makeScene2D, View2D} from "@motion-canvas/2d";
 import {Rect, Txt,} from "@motion-canvas/2d/lib/components";
 import {all, sequence, waitUntil} from "@motion-canvas/core/lib/flow";
-import {createRef, makeRef, range, Reference, useLogger, useRandom} from "@motion-canvas/core/lib/utils";
+import {createRef, makeRef, range, Reference, useLogger, useRandom, useTime} from "@motion-canvas/core/lib/utils";
 import {createSignal, DEFAULT} from "@motion-canvas/core/lib/signals";
 import {easeInQuad} from "@motion-canvas/core/lib/tweening";
 import {CodeBlock, edit, insert, lines, remove} from "@motion-canvas/2d/lib/components/CodeBlock";
 import {Enemy} from "./Enemy";
 import {Logger, Random} from "@motion-canvas/core";
+import {Colors} from "./utils"
 
 
-const RED = '#9a4f50';
-const DARK_RED = '#603232';
-const ORANGE = '#c28d75';
-const GRAY = '#9a9a97';
-const LIGHT = '#c5ccb8';
 const circleSize = 200;
 const circlesCount = 20;
 let logger: Logger | Console;
@@ -24,6 +20,8 @@ export default makeScene2D(function* (view) {
     view.fontFamily('JetBrains Mono')
     view.fontStyle('monospace')
     logger = useLogger();
+    
+    
     
     const random = useRandom(112, true);
     const halfWidth = view.width() / 2;
@@ -36,14 +34,14 @@ export default makeScene2D(function* (view) {
     const rect = createRef<Rect>()
     const firstText = createSignal("");
 
-
+    
     const secondText = createSignal("");
     range(circlesCount).map((pos, i) => (
-        <Enemy 
+        <Enemy
             clip
-            backgroundColor={GRAY}
+            backgroundColor={Colors.GRAY}
             textAlign={'end'}
-            fill={RED}
+            fill={Colors.RED}
             width={0}
             height={0}
             radius={30}
@@ -52,7 +50,7 @@ export default makeScene2D(function* (view) {
             y={random.nextInt(-halfHeight, halfHeight)}
             lineWidth={5}
             ref={makeRef(allCircles, i)}>
-            <Txt text={i % 2 === 0 ? firstText : secondText} fontSize={40} fill={LIGHT}></Txt>
+            <Txt text={i % 2 === 0 ? firstText : secondText} fontSize={40} fill={Colors.LIGHT}></Txt>
         </Enemy>
     ));
 
@@ -79,12 +77,12 @@ export default makeScene2D(function* (view) {
             <Txt ref={enemiesArrayText}
                  position={[-680, -40]}
                  layout={false}
-                 fill ={DARK_RED} 
+                 fill ={Colors.DARK_RED} 
             />         
             <Txt ref={redEnemiesArrayText}
                  position={[0, -40]}
                  layout={false}
-                 fill ={LIGHT} 
+                 fill ={Colors.LIGHT} 
             />
         </Rect>
         </>
@@ -100,7 +98,7 @@ export default makeScene2D(function* (view) {
 
     function* changeColor() {
         yield* all(
-            ...firstCircles.map((circle) => circle.fill(ORANGE, .8))
+            ...firstCircles.map((circle) => circle.fill(Colors.ORANGE, .8))
         );
     }
 
@@ -120,8 +118,8 @@ export default makeScene2D(function* (view) {
 
     rect().layout(true);
     yield* all(
-        rect().fill(GRAY, 1),
-        ...allCircles.map((c) => c.stroke(DARK_RED, 1)),
+        rect().fill(Colors.GRAY, 1),
+        ...allCircles.map((c) => c.stroke(Colors.DARK_RED, 1)),
     )
 
     // yield* waitUntil('event_3');
@@ -153,7 +151,7 @@ export default makeScene2D(function* (view) {
 
     yield* firstMethod(view, allCircles,random);
     
-    yield* sequenceMethod(view, allCircles, random,rect);
+    yield* sequenceMethod(view, allCircles, random, rect);
 });
 
 
@@ -228,7 +226,7 @@ class Enemy
 
     yield codeRef().position([codeRef().position().x, codeRef().position().y + 100],2)
 
-    const onlyRed = allCircles.filter((c, i) => c.fill().toString() == RED);
+    const onlyRed = allCircles.filter((c, i) => c.fill().toString() == Colors.RED);
 
     // onlyRed.sort((n1, n2) => +n1.text > +n2.text ? 1 : -1);
     yield* sequence(
@@ -260,7 +258,7 @@ class Enemy
     yield* codeRef().selection(DEFAULT,1);
     
     let warningRect = createRef<Rect>()
-    view.add(<Rect ref={warningRect} fill={RED} opacity={0.2} size={[800,60]} position={[-420,180]}/>)
+    view.add(<Rect ref={warningRect} fill={Colors.RED} opacity={0.2} size={[800,60]} position={[-420,180]}/>)
 
     yield * warningRect().opacity(.5,.3).to(.2,.3).to(.5,.3).to(.2,.3).to(.5,.3);
     
@@ -325,6 +323,14 @@ class Enemy
     )
     yield* codeRef().selection(DEFAULT,1);
     yield* waitUntil('descending correct order');
+    
+    yield* codeRef().edit(2)`var newEnemies = enemies
+    .Where(e => e.Color == Color.Red && !string.IsNullOrEmpty(e.Name))
+    ${edit('.OrderByDescending','.OrderBy')}(e => e.DangerCount)
+    ${edit('.ThenByDescending','.ThenBy')}(e => e.HealthPercent)
+    .Select(e => e.Name)${insert('\n    .Reverse()')};`
+    
+    yield* waitUntil('reverse order');
 }
 
 
@@ -473,7 +479,7 @@ public class EnemyPresenter : MonoBehaviour
         ${insert('public string Name { get; }')}
     }`;
 
-    yield redEnemiesArrayText().fill(DARK_RED,.2)
+    yield redEnemiesArrayText().fill(Colors.DARK_RED,.2)
     yield redEnemiesArrayText().text('List<\string> enemyNames', 2)
     
     yield* waitUntil('new property name');
@@ -608,7 +614,7 @@ function* bounceCirclesChain(allCircles: any[], targetSize: number) {
     yield sequence(
         0.1,
         ...allCircles.map((c, i) =>
-            c.stroke(c.fill() == RED ? LIGHT : c.stroke(), .1),
+            c.stroke(c.fill() == Colors.RED ? Colors.LIGHT : c.stroke(), .1),
         )
     )
     yield sequence(
