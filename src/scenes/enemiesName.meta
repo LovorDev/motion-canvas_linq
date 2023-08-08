@@ -10,8 +10,20 @@
       "targetTime": 26.811920680491642
     },
     {
+      "name": "Skip Line",
+      "targetTime": 40.940398319334356
+    },
+    {
+      "name": "Take Line",
+      "targetTime": 51.4130056012459
+    },
+    {
+      "name": "Range",
+      "targetTime": 56.48244197118519
+    },
+    {
       "name": "new scene start",
-      "targetTime": 41.987042954590066
+      "targetTime": 77.33461451212096
     }
   ],
   "seed": 3848055721

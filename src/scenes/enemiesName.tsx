@@ -1,19 +1,10 @@
 import {makeScene2D, View2D} from "@motion-canvas/2d";
 import {all, sequence, waitFor, waitUntil} from "@motion-canvas/core/lib/flow";
-import {
-    DEFAULT,
-    Direction,
-    easeInCubic, easeInOutBack,
-    easeInQuint,
-    easeOutBack,
-    easeOutCubic,
-    slideTransition
-} from "@motion-canvas/core";
-import {Rect, Txt, Line} from "@motion-canvas/2d/lib/components";
+import {Color, DEFAULT, Direction, easeInOutBack, easeInQuint, slideTransition} from "@motion-canvas/core";
+import {Line, Rect, Txt} from "@motion-canvas/2d/lib/components";
 import {createRef, makeRef, range, Reference} from "@motion-canvas/core/lib/utils";
 import {Colors} from "./utils";
 import {CodeBlock, edit, remove} from "@motion-canvas/2d/lib/components/CodeBlock";
-import {easeInQuad} from "@motion-canvas/core/lib/tweening";
 
 const names = [
     "Timothy", "Jordan",
@@ -73,7 +64,7 @@ export default makeScene2D(function* (view) {
 
     yield* namesCodeBlock(view, enemyNamesArray, initCode, codeRect);
 
-    yield* takeSkip(view, enemyNamesArray, initCode, codeRect);
+    yield* takeSkip(view, enemyNamesArray, initCode);
 
     yield* waitUntil('new scene start');
 })
@@ -87,16 +78,18 @@ function* namesCodeBlock(view: View2D, enemyNamesArray: Txt[], initCode: Referen
             .ToList();`, `enemiesNames: [20]`)}`
 
     const duration = 1.2;
+
     yield codeRect().radius(10, duration)
     yield initCode().fontSize(36, duration)
     yield codeRect().padding(codeRect().padding().scale(.5), duration)
 
     yield* codeRect().position([-690, -480], duration)
 
-    yield* view.add(<CodeBlock position={[200, 0]} language="c#" ref={codeRef}
-                               code={'var uniqNames = enemiesNames.Distinct().ToList();'}/>)
+    view.add(<CodeBlock position={[200, 0]} language="c#" ref={codeRef}
+                        code={'var uniqNames = enemiesNames.Distinct().ToList();'}/>)
 
     yield initCode().edit(2)`enemiesNames: [${edit('20', '15')}]`
+
     yield* sequence(
         0.5,
         enemyNamesArray[5].opacity(.5, .35),
@@ -126,7 +119,7 @@ function* namesCodeBlock(view: View2D, enemyNamesArray: Txt[], initCode: Referen
     yield initCode().selection(DEFAULT, 1)
 }
 
-function* takeSkip(view: View2D, enemyNamesArray: Txt[], initCode: Reference<CodeBlock>, codeRect: Reference<Rect>) {
+function* takeSkip(view: View2D, enemyNamesArray: Txt[], initCode: Reference<CodeBlock>) {
 
     let cellSize = 64
     let arrayLineRef = createRef<Line>()
@@ -136,6 +129,7 @@ function* takeSkip(view: View2D, enemyNamesArray: Txt[], initCode: Reference<Cod
 
     let takeCodeRef = createRef<CodeBlock>()
     let skipCodeRef = createRef<CodeBlock>()
+    let exampleRef = createRef<CodeBlock>()
 
     let skipLineSelection = createRef<Line>();
     let takeLineSelection = createRef<Line>();
@@ -144,6 +138,7 @@ function* takeSkip(view: View2D, enemyNamesArray: Txt[], initCode: Reference<Cod
 
     view.add(
         <Rect position={[200, 0]}>
+            <CodeBlock language="c#" ref={exampleRef} code={"var namesRange = enemiesNames.Skip(4).Take(12)"} position = {[0,-300]} opacity={0}></CodeBlock>
             <Rect size={[cellSize * cellsCount - cellSize * .16, 80]} radius={12} clip>
                 <Line
                     lineWidth={80}
@@ -157,28 +152,6 @@ function* takeSkip(view: View2D, enemyNamesArray: Txt[], initCode: Reference<Cod
                     ]}
                 /></Rect>
 
-            <Rect fill={'darkslateblue'}
-                  layout
-                  padding={[30, 30, 20, 30]}
-                  position={[-200, -200]}
-                  ref={takeRef}
-                  radius={30}
-                  stroke={'blue'}>
-                <Line
-                    position={[-130, 0]}
-                    layout={false}
-                    lineWidth={16}
-                    stroke={'darkslateblue'}
-                    radius={120}
-                    endArrow
-                    arrowSize={18}
-                    points={[[0, 0], [-400, 0]]}
-                    ref={takeLineSelection}/>
-                <CodeBlock
-                    language="c#"
-                    ref={takeCodeRef}
-                    code={'.Take(...)'}/>
-            </Rect>
             <Rect fill={Colors.RED}
                   layout padding={[30, 30, 20, 30]}
                   position={[200, -200]}
@@ -200,6 +173,30 @@ function* takeSkip(view: View2D, enemyNamesArray: Txt[], initCode: Reference<Cod
                     language="c#"
                     ref={skipCodeRef}
                     code={'.Skip(...)'}/>
+            </Rect>
+            <Rect fill={'darkslateblue'}
+                  layout
+                  padding={[30, 30, 20, 30]}
+                  position={[-200, -200]}
+                  ref={takeRef}
+                  radius={30}
+                  stroke={'blue'}>
+                <Line
+                    position={[-130, 0]}
+                    layout={false}
+                    lineWidth={16}
+                    stroke={'darkslateblue'}
+                    radius={30}
+                    endArrow
+                    end={0}
+                    arrowSize={18}
+                    points={[[0, 0], [-800, 0], [-800, -120], [-920, -120]]}
+                    ref={takeLineSelection}/>
+                <Txt ></Txt>
+                <CodeBlock
+                    language="c#"
+                    ref={takeCodeRef}
+                    code={'.Take(...)'}/>
             </Rect>
         </Rect>
     )
@@ -245,19 +242,68 @@ function* takeSkip(view: View2D, enemyNamesArray: Txt[], initCode: Reference<Cod
     yield sequence(
         1,
         skipCodeRef().edit(.9)`.Skip(${edit('...', '1')})`,
-        skipCodeRef().edit(.9)`.Skip(${edit('1', '2')})`,
-        skipCodeRef().edit(.9)`.Skip(${edit('2', '3')})`,
-        skipCodeRef().edit(.9)`.Skip(${edit('3', '4')})`,
+        skipCodeRef().edit(0)`.Skip(${edit('1', '2')})`,
+        skipCodeRef().edit(0)`.Skip(${edit('2', '3')})`,
+        skipCodeRef().edit(0)`.Skip(${edit('3', '4')})`,
     )
     yield sequence(
         .8,
         waitFor(1),
-        enemyNamesArray[0].opacity(.4,.6),
-        enemyNamesArray[1].opacity(.4,.6),
-        enemyNamesArray[2].opacity(.4,.6),
-        enemyNamesArray[3].opacity(.4,.6),
+        ...enemyNamesArray.slice(0, 4).map((x)=>x.opacity(.4, .6)),
     )
-    yield* skipLineSelection().points([[0, 0], [-500, 0], [-500, -320], [-600, -320]], 4);
-    
 
+    
+    yield* skipLineSelection().points([[0, 0], [-500, 0], [-500, -320], [-600, -320]], 4);
+
+    yield skipCodeRef().selection(DEFAULT,1)
+    
+    yield* initCode().edit(2)`enemiesNames: [${edit('20', '16')}]`
+    
+    yield* waitUntil("Skip Line")
+    
+    yield initCode().selection(DEFAULT,1)
+
+    yield* takeLineSelection().end(1, 2);
+
+    let dur = 4 / 12
+    yield sequence(
+        dur,
+        takeCodeRef().edit(dur*.9)`.Take(${edit('...', '1')})`,
+        takeCodeRef().edit(0)`.Take(${edit('1', '2')})`,
+        takeCodeRef().edit(0)`.Take(${edit('2', '3')})`,
+        takeCodeRef().edit(0)`.Take(${edit('3', '4')})`,
+        takeCodeRef().edit(0)`.Take(${edit('4', '5')})`,
+        takeCodeRef().edit(0)`.Take(${edit('5', '6')})`,
+        takeCodeRef().edit(0)`.Take(${edit('6', '7')})`,
+        takeCodeRef().edit(0)`.Take(${edit('7', '8')})`,
+        takeCodeRef().edit(0)`.Take(${edit('8', '9')})`,
+        takeCodeRef().edit(0)`.Take(${edit('9', '10')})`,
+        takeCodeRef().edit(0)`.Take(${edit('10', '11')})`,
+        takeCodeRef().edit(0)`.Take(${edit('11', '12')})`,
+    )
+    
+    yield sequence(
+        .25,
+        ...enemyNamesArray.slice(4, 16).map((x) => x.fill(Color.lerp('#313131','darkslateblue',.4), 1))
+    )
+
+
+    yield* takeLineSelection().points([[0, 0], [-800, 0], [-800, 370], [-927, 370]], 4);
+    
+    yield initCode().edit(2)`enemiesNames: [${edit('16', '12')}]`
+    yield takeCodeRef().selection(DEFAULT,1)
+    
+    yield sequence(
+        .25,
+        ...enemyNamesArray.slice(16, 20).map((x) => x.opacity(.4, 1))
+    )
+    yield* exampleRef().opacity(1,2);
+    yield initCode().selection(DEFAULT,1)
+    
+    yield* waitUntil("Take Line")
+    
+    yield* exampleRef().edit(2)`var namesRange = enemiesNames${edit('.Skip(4).Take(12)','[4..12]')}`
+    yield* waitUntil("Range")
+    yield* exampleRef().edit(2)`var namesRange = enemiesNames${edit('[4..12]','.Skip(4).Take(12)')}`
+    yield* exampleRef().selection(DEFAULT,1)
 }
