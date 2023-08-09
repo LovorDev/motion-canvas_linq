@@ -95,8 +95,6 @@ export default makeScene2D(function* (view) {
     yield* namesCodeBlock(view, enemyNamesRectArray, initCode, codeRect);
 
     yield* takeSkip(view, enemyNamesRectArray, enemyNamesTxtArray, initCode);
-
-    yield* waitUntil('new scene start');
 })
 
 function* namesCodeBlock(view: View2D, enemyNamesArray: Txt[], initCode: Reference<CodeBlock>, codeRect: Reference<Rect>) {
@@ -533,5 +531,4 @@ function* takeSkip(view: View2D, enemyNamesArray: Txt[], enemyNamesTxtArray: Txt
     yield* exampleRef().selection(DEFAULT,1)
     
     yield* waitUntil("Sorted Examples")
-//x => 
 }

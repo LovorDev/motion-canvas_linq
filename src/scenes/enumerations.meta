@@ -1,0 +1,30 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "first methods",
+      "targetTime": 6.210313679191476
+    },
+    {
+      "name": "concat method",
+      "targetTime": 11.729872770390603
+    },
+    {
+      "name": "concat circles method",
+      "targetTime": 14.454515191087493
+    },
+    {
+      "name": "circles concat",
+      "targetTime": 25.92663482576838
+    },
+    {
+      "name": "intersect circles method",
+      "targetTime": 33.44347974664787
+    },
+    {
+      "name": "circles intersect",
+      "targetTime": 44.263601240787246
+    }
+  ],
+  "seed": 2101113221
+}
