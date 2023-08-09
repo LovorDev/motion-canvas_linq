@@ -11,19 +11,51 @@
     },
     {
       "name": "Skip Line",
-      "targetTime": 40.940398319334356
+      "targetTime": 38.489877972196396
     },
     {
       "name": "Take Line",
-      "targetTime": 51.4130056012459
+      "targetTime": 47.73722508053896
     },
     {
       "name": "Range",
-      "targetTime": 56.48244197118519
+      "targetTime": 53.87876410235111
+    },
+    {
+      "name": "SkipTakeLast",
+      "targetTime": 65.25454462305805
+    },
+    {
+      "name": "Take While Example",
+      "targetTime": 77.70058886122081
+    },
+    {
+      "name": "Skip While Example",
+      "targetTime": 91.07900655648587
+    },
+    {
+      "name": "Other Examples",
+      "targetTime": 107.37109503281141
+    },
+    {
+      "name": "StartWith accent Examples",
+      "targetTime": 118.38382853258706
+    },
+    {
+      "name": "StartWith Examples",
+      "targetTime": 126.25668580981782
+    },
+    {
+      "name": "Week Month Examples",
+      "targetTime": 138.3827282477959
+    },
+    {
+      "name": "Sorted Examples",
+      "targetTime": 157.3862751698609
     },
     {
       "name": "new scene start",
-      "targetTime": 77.33461451212096
+      "targetTime": 162.7543528712789
     }
   ],
   "seed": 3848055721

@@ -1,7 +1,7 @@
 import {Rect, RectProps, Txt,} from "@motion-canvas/2d/lib/components";
 import {Color, PossibleColor, SignalValue} from "@motion-canvas/core";
 import {initial, Length, signal} from "@motion-canvas/2d";
-import {createRef} from "@motion-canvas/core/lib/utils";
+import {createRef, Reference} from "@motion-canvas/core/lib/utils";
 import {createSignal, Signal, SimpleSignal} from "@motion-canvas/core/lib/signals";
 
 export interface  EnemyProps extends RectProps {
@@ -11,9 +11,12 @@ export interface  EnemyProps extends RectProps {
     
     text?: SignalValue<string>;
     
+    Text?: Reference<Txt>;
+    
 }
 export class  Enemy extends Rect {
     private readonly healthRect = createRef<Rect>();
+    public readonly Text = createRef<Txt>()
     
     public constructor(props: EnemyProps) {
         super(props);
@@ -21,7 +24,7 @@ export class  Enemy extends Rect {
             <Rect fill={this.backgroundColor} width="100%" height={this.health} ref={this.healthRect}></Rect>
         );
         this.add(
-            <Txt layout={false} text={this.text} fontSize={this.fontSize} fill={this.textColor} position={[16,16]}></Txt>
+            <Txt layout={false} text={this.text} fontSize={this.fontSize} ref={this.Text} fill={this.textColor} position={[16,16]}></Txt>
         )
     }
     
