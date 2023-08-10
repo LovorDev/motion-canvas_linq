@@ -1,10 +1,26 @@
 import {makeScene2D} from "@motion-canvas/2d";
 import {all, sequence, waitUntil} from "@motion-canvas/core/lib/flow";
 import {Color, DEFAULT, Direction, easeOutBack, slideTransition} from "@motion-canvas/core";
-import {Rect, Txt} from "@motion-canvas/2d/lib/components";
+import {Rect, Txt,Circle} from "@motion-canvas/2d/lib/components";
 import {CodeBlock, edit} from "@motion-canvas/2d/lib/components/CodeBlock";
 import {Colors} from "./utils";
-import {createRef} from "@motion-canvas/core/lib/utils";
+import {createRef, Reference} from "@motion-canvas/core/lib/utils";
+
+function* RevertCircles(completeText: Reference<Txt>, firstArrayText: Reference<Txt>, secondArrayText: Reference<Txt>, firstArrayCircle: Reference<Rect>, scale: number, secondArrayCircle: Reference<Rect>) {
+    
+    yield* completeText().opacity(0, 1)
+    yield firstArrayText().opacity(1, 1)
+    yield secondArrayText().opacity(1, 1)
+
+    yield firstArrayCircle().radius(scale, 2)
+    yield secondArrayCircle().radius(scale, 2)
+
+    yield firstArrayCircle().fill(Color.lerp('orange', 'lightgreen', 0), 2)
+    yield secondArrayCircle().fill(Color.lerp('orange', 'lightgreen', 1), 2)
+
+    yield secondArrayCircle().position([600, 100], 3, easeOutBack)
+    yield* firstArrayCircle().position([-600, 100], 3, easeOutBack)
+}
 
 export default makeScene2D(function* (view) {
 
@@ -87,6 +103,7 @@ export default makeScene2D(function* (view) {
     yield* waitUntil("concat method")
 
     let firstArrayCircle = createRef<Rect>()
+    let intersectRef = createRef<Rect>()
     let secondArrayCircle = createRef<Rect>()
 
     let firstArrayText = createRef<Txt>()
@@ -99,6 +116,15 @@ export default makeScene2D(function* (view) {
     let scale = 300
     view.add(
         <>
+
+            {/*<Circle size={scale*2}*/}
+            {/*        // fill={'#FFC66D'}*/}
+            {/*        clip*/}
+            {/*>*/}
+            {/*    <Circle size={scale*2} position={[340,0]} fill={'white'}></Circle>*/}
+            {/*    /!*<Circle size={scale*2} position={[-340,0]}></Circle>*!/*/}
+            {/*</Circle>*/}
+
             <Rect
                 ref={firstArrayCircle}
                 fill={'orange'}
@@ -106,14 +132,15 @@ export default makeScene2D(function* (view) {
                 position={[-600, 900]}
                 justifyContent={'center'}
                 size={scale * 2}
+                clip
             >
+                <Circle size={scale*2} position={[360,0]} fill={'#76d476'} opacity={0} ref={intersectRef}></Circle>
                 <Txt
                     ref={firstArrayText}
                     shadowOffset={[-6, 6]}
                     shadowBlur={10}
                     shadowColor={'rgba(0,0,0,0.38)'}
                     text={"[]{one, two, three,\n four, five, six}"}/>
-
             </Rect>
             <Rect
                 ref={secondArrayCircle}
@@ -131,6 +158,7 @@ export default makeScene2D(function* (view) {
 
             </Rect>
             <Txt
+                fill={'white'}
                 position={[0, 100]}
                 opacity={0}
                 ref={completeText}
@@ -174,26 +202,15 @@ export default makeScene2D(function* (view) {
 
     yield firstArrayText().opacity(0, 1)
     yield secondArrayText().opacity(0, 1)
-    yield completeText().text("[]{one, two, three, one, red, three\n four, five, six, green, black six}", 0)
+    yield completeText().text("[]{one, two, three, four, five, six\n one, red, three, green, black, six}", 0)
     yield* completeText().opacity(1, 3)
 
     yield* waitUntil("circles concat")
+    
+    yield* RevertCircles(completeText, firstArrayText, secondArrayText, firstArrayCircle, scale, secondArrayCircle);
 
-    yield* completeText().opacity(0, 1)
-    yield firstArrayText().opacity(1, 1)
-    yield secondArrayText().opacity(1, 1)
-
-    yield firstArrayCircle().radius(scale, 2)
-    yield secondArrayCircle().radius(scale, 2)
-
-
-    yield firstArrayCircle().fill(Color.lerp('orange', 'lightgreen', 0), 2)
-    yield secondArrayCircle().fill(Color.lerp('orange', 'lightgreen', 1), 2)
-
-    yield secondArrayCircle().position([600, 100], 3, easeOutBack)
-    yield* firstArrayCircle().position([-600, 100], 3, easeOutBack)
-
-
+    yield* waitUntil("revert concat")
+    
     yield* sequence(
         .2,
         all(concatRectRef().position([800 * -1, -400], 2),
@@ -208,20 +225,29 @@ export default makeScene2D(function* (view) {
 
     yield* waitUntil("intersect circles method")
 
+    yield secondArrayCircle().compositeOperation('color')
 
     yield mainCodeRef().edit(2)`var newList = first${edit('.Concat', '.Intersect')}(second)`
-    yield firstArrayCircle().position([-180, 100], 4)
-    yield* secondArrayCircle().position([180, 100], 4)
+    yield firstArrayCircle().position([-180, 100], 6)
+    yield* secondArrayCircle().position([180, 100], 6)
 
+    
     yield firstArrayText().opacity(0, 1)
     yield* secondArrayText().opacity(0, 1)
-    
-    yield* secondArrayCircle().compositeOperation('difference',2)
 
-    yield completeText().text("[]{one, two, three, one, red, three\n four, five, six, green, black six}", 0)
+    yield intersectRef().opacity(1)
+    yield firstArrayCircle().fill("rgba(0,0,0,0)", 1)
+    yield* secondArrayCircle().fill("rgba(0,0,0,0)", 1)
     
+    yield completeText().text("[]{one, three, six}", 0)
+
     yield* completeText().opacity(1, 3)
-    yield mainCodeRef().selection(DEFAULT,1)
+    yield mainCodeRef().selection(DEFAULT, 1)
 
     yield* waitUntil("circles intersect")
+
+    yield* intersectRef().opacity(0,1)
+    yield* RevertCircles(completeText, firstArrayText, secondArrayText, firstArrayCircle, scale, secondArrayCircle);
+
+    yield* waitUntil("revert intersect")
 })
