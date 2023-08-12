@@ -1,0 +1,14 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "last methods",
+      "targetTime": 9
+    },
+    {
+      "name": "point animation",
+      "targetTime": 12.353330927724208
+    }
+  ],
+  "seed": 1000646757
+}

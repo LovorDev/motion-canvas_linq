@@ -31,7 +31,39 @@
     },
     {
       "name": "revert intersect",
-      "targetTime": 55.58856844998374
+      "targetTime": 55.1508907346186
+    },
+    {
+      "name": "except circles method",
+      "targetTime": 58.42303865464364
+    },
+    {
+      "name": "where example except",
+      "targetTime": 70.86071637000879
+    },
+    {
+      "name": "where except 2",
+      "targetTime": 73.86112257655768
+    },
+    {
+      "name": "where except",
+      "targetTime": 76.94049793109096
+    },
+    {
+      "name": "circles except",
+      "targetTime": 82.95694169116607
+    },
+    {
+      "name": "revert except",
+      "targetTime": 89.45714479444051
+    },
+    {
+      "name": "union circles method",
+      "targetTime": 93.22949581773999
+    },
+    {
+      "name": "circles union",
+      "targetTime": 103.79998895100371
     }
   ],
   "seed": 2101113221

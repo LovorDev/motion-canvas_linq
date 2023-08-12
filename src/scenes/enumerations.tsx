@@ -2,7 +2,7 @@ import {makeScene2D} from "@motion-canvas/2d";
 import {all, sequence, waitUntil} from "@motion-canvas/core/lib/flow";
 import {Color, DEFAULT, Direction, easeOutBack, slideTransition} from "@motion-canvas/core";
 import {Rect, Txt,Circle} from "@motion-canvas/2d/lib/components";
-import {CodeBlock, edit} from "@motion-canvas/2d/lib/components/CodeBlock";
+import {CodeBlock, edit, insert} from "@motion-canvas/2d/lib/components/CodeBlock";
 import {Colors} from "./utils";
 import {createRef, Reference} from "@motion-canvas/core/lib/utils";
 
@@ -154,7 +154,7 @@ export default makeScene2D(function* (view) {
                      shadowOffset={[-6, 6]}
                      shadowBlur={10}
                      shadowColor={'rgba(0,0,0,0.38)'}
-                     text={"[]{one, red, three,\n green, black six}"}/>
+                     text={"[]{one, red, three,\n green, black, six}"}/>
 
             </Rect>
             <Txt
@@ -230,7 +230,6 @@ export default makeScene2D(function* (view) {
     yield mainCodeRef().edit(2)`var newList = first${edit('.Concat', '.Intersect')}(second)`
     yield firstArrayCircle().position([-180, 100], 6)
     yield* secondArrayCircle().position([180, 100], 6)
-
     
     yield firstArrayText().opacity(0, 1)
     yield* secondArrayText().opacity(0, 1)
@@ -241,7 +240,7 @@ export default makeScene2D(function* (view) {
     
     yield completeText().text("[]{one, three, six}", 0)
 
-    yield* completeText().opacity(1, 3)
+    yield* completeText().opacity(1, 1)
     yield mainCodeRef().selection(DEFAULT, 1)
 
     yield* waitUntil("circles intersect")
@@ -250,4 +249,121 @@ export default makeScene2D(function* (view) {
     yield* RevertCircles(completeText, firstArrayText, secondArrayText, firstArrayCircle, scale, secondArrayCircle);
 
     yield* waitUntil("revert intersect")
+    
+    yield* sequence(
+        .2,
+        all(concatRectRef().position([800 * -2, -400], 2),
+            concatRectRef().opacity(.1, 2),),
+        all(intersectRectRef().opacity(.1, 2),
+            intersectRectRef().position([800 * -1, -400], 2),),
+        all(exceptRectRef().opacity(1, 2),
+            exceptRectRef().position([800 * 0, -400], 2),),
+        all(unionRectRef().opacity(.1, 2),
+            unionRectRef().position([800 * 1, -400], 2),),
+    )
+    
+    yield* waitUntil("except circles method")
+
+    yield mainCodeRef().edit(2)`var newList = first${edit('.Intersect', '.Except')}(second)`
+    
+
+    yield secondArrayCircle().compositeOperation('destination-out',4)
+        
+    yield firstArrayCircle().position([-180, 100], 6)
+    yield* secondArrayCircle().position([180, 100], 6)
+
+    yield firstArrayText().opacity(0, 1)
+    yield secondArrayText().opacity(0, 1)
+    
+    yield* secondArrayCircle().fill('rgb(31,31,31)',1)
+
+    yield completeText().text("[]{two, four, five}", 0)
+    yield completeText().position([-270,100], 0)
+    
+    
+    yield* completeText().opacity(1, 1)
+
+    let offset = 340;
+    yield completeText().position([-270-offset,100], 2)
+    yield firstArrayCircle().position([-180-offset, 100], 2)
+    yield* secondArrayCircle().position([180- offset, 100], 2)
+
+    let exceptCodeRef = createRef<CodeBlock>();
+    view.add(<CodeBlock position={[300,0]} opacity={0} ref={exceptCodeRef} code={`var exceptedList = names
+        .Where(x => x != "Alex")`}/>)
+
+    yield* exceptCodeRef().opacity(1,2)
+    
+    yield* waitUntil("where example except")
+
+    yield* exceptCodeRef().edit(2)`var exceptedList = names
+        .Where(x => x != "Alex"${insert(' && x != \"John\"')})`
+    
+    yield* waitUntil("where except 2")
+    
+    yield* exceptCodeRef().edit(2)`var exceptedList = names
+        .Where(x => x != "Alex" && x != \"John\"${insert(' && x != \"Doe\"')})`
+    
+    yield* waitUntil("where except")
+
+    yield* exceptCodeRef().edit(4)`var exceptedList = names
+        ${edit('.Where(x => x != "Alex" && x != \"John\" && x != \"Doe\")','.Except(new[] {"Alex", "John", "Doe"})')}`
+    
+    yield* waitUntil("circles except")
+    
+    
+    yield* exceptCodeRef().opacity(0,2)
+    exceptCodeRef().remove()
+
+    yield secondArrayCircle().compositeOperation('color',4)
+    yield* RevertCircles(completeText, firstArrayText, secondArrayText, firstArrayCircle, scale, secondArrayCircle);
+    
+    yield* waitUntil("revert except")
+    
+    yield* sequence(
+        .2,
+        all(concatRectRef().position([800 * -3, -400], 2),
+            concatRectRef().opacity(.1, 2),),
+        all(intersectRectRef().opacity(.1, 2),
+            intersectRectRef().position([800 * -2, -400], 2),),
+        all(exceptRectRef().opacity(.1, 2),
+            exceptRectRef().position([800 * -1, -400], 2),),
+        all(unionRectRef().opacity(1, 2),
+            unionRectRef().position([800 * 0, -400], 2),),
+    )
+
+    yield* waitUntil("union circles method")
+    
+    yield mainCodeRef().edit(2)`var newList = first${edit('.Except', '.Union')}(second)`
+
+    yield secondArrayCircle().compositeOperation('darken')
+
+    yield firstArrayCircle().fill(Color.lerp('orange', 'lightgreen', .5), 4)
+    yield secondArrayCircle().fill(Color.lerp('orange', 'lightgreen', .5), 4)
+    
+    yield firstArrayCircle().position([-180, 100], 6)
+    yield* secondArrayCircle().position([180, 100], 6)
+
+
+    yield firstArrayText().opacity(0, 1)
+    yield* secondArrayText().opacity(0, 1)
+
+    yield completeText().position([0,100])
+    yield completeText().text("[] {one, two, three, four,\nfive, six red, green, black}", 0)
+
+    yield* completeText().opacity(1, 1)
+
+    yield* waitUntil("circles union")
+
+    yield* sequence(
+        .2,
+        all(unionRectRef().opacity(1, 2),
+            unionRectRef().position([800 * 3, -400], 2),),
+        all(exceptRectRef().opacity(1, 2),
+            exceptRectRef().position([800 * 3, -400], 2),),
+        all(intersectRectRef().opacity(1, 2),
+            intersectRectRef().position([800 * 3, -400], 2),),
+        all(concatRectRef().position([800 * 3, -400], 2),
+            concatRectRef().opacity(1, 2),),
+    )
 })

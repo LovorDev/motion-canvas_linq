@@ -149,19 +149,19 @@ function* namesCodeBlock(view: View2D, enemyNamesArray: Txt[], initCode: Referen
 
 function* takeSkip(view: View2D, enemyNamesArray: Txt[], enemyNamesTxtArray: Txt[], initCode: Reference<CodeBlock>) {
 
-    let cellSize = 64
     let arrayLineRef = createRef<Line>()
-
     let takeRef = createRef<Rect>()
-    let skipRef = createRef<Rect>()
 
+    let skipRef = createRef<Rect>()
     let takeCodeRef = createRef<CodeBlock>()
+
     let skipCodeRef = createRef<CodeBlock>()
     let exampleRef = createRef<CodeBlock>()
-
     let skipLineSelection = createRef<Line>();
+
     let takeLineSelection = createRef<Line>();
 
+    let cellSize = 64
     const cellsCount = 18;
 
     view.add(
